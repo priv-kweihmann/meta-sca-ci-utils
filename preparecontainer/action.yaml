@@ -1,0 +1,28 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'Prepare container'
+description: 'as the name implies it'
+inputs:
+  scripts-export-path:
+    description: 'Path to symlink the scripts to'
+    required: false
+    default: "/github/actions/scripts"
+  needle:
+    description: 'path to look for'
+    required: false
+    default: "/__w/_actions/priv-kweihmann/meta-sca-ci-utils/"
+runs:
+  using: "composite"
+  steps:
+    - name: container preparation
+      run: |
+        sudo sysctl fs.inotify.max_user_watches=524288 2>&1
+        sudo chown yoctouser:yoctouser ${WORKSPACE} 2>&1
+      shell: bash
+    - name: symlink actions
+      run: |
+        ACTIONS_DIR=$(find ${{ inputs.needle }} -type d -name 'scripts' | head -n1)
+        sudo mkdir -p $(dirname ${{ inputs.scripts-export-path }})
+        sudo ln -sf ${ACTIONS_DIR} ${{ inputs.scripts-export-path }}
+        ls -lisa ${{ inputs.scripts-export-path }}
+      shell: bash

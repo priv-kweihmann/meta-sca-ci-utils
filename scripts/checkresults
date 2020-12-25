@@ -1,0 +1,58 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+MODFILE=""
+CLEAN="1"
+SOURCES="${WORKSPACE}/sources/meta-sca/"
+
+THISDIR="$(dirname $0)"
+
+usage() {
+    echo "$(basename $0) - check results of modules"
+    echo "--modfile - modfile to test"
+    echo "--clean - cleanup afterwards (set 0 to disable)"
+    echo "--src - base path to meta-sca"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --modfile=*)
+        MODFILE="${i#*=}"
+        shift
+        ;;
+    --clean=*)
+        CLEAN="${i#*=}"
+        shift
+        ;;
+    --src=*)
+        SOURCES="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${MODFILE}" ] && usage && exit 1
+
+if [ ! -f "${MODFILE}" ]; then
+    MODFILE=$(find ${SOURCES}/test -type f -name "*${MODFILE}*" | head -n1 )
+    
+fi
+
+[ -z "${MODFILE}" ] && echo "--modfile not found" && exit 2
+
+source ${THISDIR}/utils
+
+setup_bitbake
+sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR)"
+${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/check_results ${sca_export_dir} ${MODFILE}
+[ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true

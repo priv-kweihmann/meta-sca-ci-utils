@@ -1,0 +1,31 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'bitbake layer'
+description: 'Adds a bitbake layer'
+inputs:
+  branch: 
+    description: 'SCA branch to use'
+    required: true
+  repo:
+    description: 'repo url'
+    required: true
+  add-layer:
+    description: 'automatically run add-layer'
+    required: false
+    default: "1"
+  add-layer-suffix:
+    description: 'suffix to append when running add-layer'
+    required: false
+    default: ""
+runs:
+  using: "composite"
+  steps:
+    - name: checkout
+      run: |
+        /github/actions/scripts/checkout \
+        --branch=${{ inputs.branch }} \
+        --addlayer=${{ inputs.add-layer }} \
+        --addlayersuffix=${{ inputs.add-layer-suffix }} \
+        --url=${{ inputs.repo }}
+      shell: bash
+ 

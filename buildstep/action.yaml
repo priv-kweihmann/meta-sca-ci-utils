@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'bitbake build'
+description: 'builds a single target with bitbake'
+inputs:
+  target: 
+    description: 'Target to build'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: build
+      run: |
+        /github/actions/scripts/build \
+        --target=${{ inputs.target }}
+      shell: bash

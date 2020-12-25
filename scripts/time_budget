@@ -1,0 +1,29 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+now(){
+    echo "$(cat /proc/uptime | cut -d ' ' -f 1 | cut -d '.' -f 1)"
+}
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+_timeout=${BUILD_MAXRUNTIME}
+_killto=20
+if [ -e "${WORKSPACE}/.timebudget" ]; then
+    _timeout=$(cat "${WORKSPACE}/.timebudget")
+fi
+[ ! -n "${_timeout}" ] && _timeout=1
+[ "${_timeout}" -le 1 ] && _timeout=1
+[ "${_killto}" -le ${_timeout} ] && _killto=${_timeout}
+
+_start=$( now )
+timeout --foreground --kill-after=${_killto}s ${_timeout}s $@
+retval=$?
+_end=$( now )
+_diff=$(expr ${_end} - ${_start})
+echo "## Command took ${_diff} seconds - exit code ${retval}"
+_newtimeout=$(expr ${_timeout} - ${_diff})
+echo ${_newtimeout} > "${WORKSPACE}/.timebudget"
+exit ${retval}

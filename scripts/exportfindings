@@ -1,0 +1,70 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+THISDIR="$(dirname $0)"
+
+BRANCH=""
+MODFILENAME=""
+WEBREPO="priv-kweihmann.github.io"
+
+usage() {
+    echo "$(basename $0) - export findings"
+    echo "--modfilename - Name of modfile to use"
+    echo "--branch - branch to export"
+    echo "--repo - name of the repository"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --modfilename=*)
+        MODFILENAME="${i#*=}"
+        shift
+        ;;
+    --branch=*)
+        BRANCH="${i#*=}"
+        shift
+        ;;
+    --repo=*)
+        WEBREPO="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${BRANCH}" ] && usage && exit 1
+[ -z "${MODFILENAME}" ] && usage && exit 1
+
+source ${THISDIR}/utils
+
+_sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR)"
+_sca_export_find_dir="$(get_var_from_bitbake SCA_EXPORT_FINDING_DIR)"
+
+setup_bitbake
+
+# Create changeset
+
+mkdir -p ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/
+${THISDIR}/time_budget ${WORKSPACE}/sources/${WEBREPO}/tools/report ${_sca_export_dir} ${_sca_export_find_dir} \
+    ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/${MODFILENAME}.json
+${THISDIR}/time_budget ${WORKSPACE}/sources/${WEBREPO}/tools/jsonmerge data/${SCABRANCH}/result.json \
+    ${WORKSPACE}/sources/${WEBREPO}/data/${MODFILENAME}/*.json
+
+# Export via git
+cd ${WORKSPACE}/sources/${WEBREPO}
+git add .
+git config --local user.email "web@deploy.bot"
+git config --local user.name "Webdeploy bot"
+git remote rm origin
+git remote add origin https://priv-kweihmann:${EXPORT_BOT_WEBSECRET}@github.com/${WEBREPO}.git
+git diff --quiet && git diff --staged --quiet || (git commit --amend -m "Update findings"; git push origin master --force) || true
+cd -

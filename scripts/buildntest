@@ -1,0 +1,59 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+MODFILE=""
+CLEAN="1"
+BUILDNTEST_PRESERVECACHE="1"
+BUILDNTEST_NOTEST="1"
+
+THISDIR="$(dirname $0)"
+
+usage() {
+    echo "$(basename $0) - build'n'test modules"
+    echo "--modfile - modfile to test"
+    echo "--clean - cleanup afterwards (set 0 to disable)"
+    echo "--preservecache - Preserve existing caches (set 0 to disable)"
+    echo "--notest - Don't test results (set 0 to disable)"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --modfile=*)
+        MODFILE="${i#*=}"
+        shift
+        ;;
+    --clean=*)
+        CLEAN="${i#*=}"
+        shift
+        ;;
+    --preservecache=*)
+        BUILDNTEST_PRESERVECACHE="${i#*=}"
+        shift
+        ;;
+    --notest=*)
+        BUILDNTEST_NOTEST="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${MODFILE}" ] && usage && exit 1
+
+source ${THISDIR}/utils
+
+export BUILDNTEST_PRESERVECACHE
+export BUILDNTEST_NOTEST
+
+setup_bitbake
+${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/buildntest ${MODFILE}
+[ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true
