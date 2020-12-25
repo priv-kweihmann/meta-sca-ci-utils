@@ -1,0 +1,33 @@
+name: 'export results'
+description: '...meta-sca build'
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+inputs:
+  branch: 
+    description: 'SCA branch to use'
+    required: true
+  parameter-file:
+    description: 'Parameter file'
+    required: true
+  deploy-token:
+    description: 'Github token for webdeploy'
+    required: true
+  repo:
+    description: 'Repository name'
+    required: false
+    default: "priv-kweihmann.github.io"
+  repo-user:
+    description: 'Repository user'
+    required: false
+    default: "priv-kweihmann"
+runs:
+  using: "composite"
+  steps:
+    - name: export results
+      run: |
+        EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} /github/actions/scripts/exportfindings \
+        --modfilename=${{ inputs.parameter-file }} \
+        --branch=${{ inputs.branch }} \
+        --repo=${{ inputs.repo }} \
+        --repouser=${{ inputs.repo-user }}
+      shell: bash

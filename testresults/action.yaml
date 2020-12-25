@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'Test results'
+description: 'test the results of sca integration'
+inputs:
+  parameter-file:
+    description: 'Parameter file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: test results
+      run: |
+        /github/actions/scripts/checkresults \
+          --modfile=${{ inputs.parameter-file }}
+      shell: bash

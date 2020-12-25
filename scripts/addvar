@@ -1,0 +1,47 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+VAR=""
+VAL=""
+
+THISDIR="$(dirname $0)"
+
+usage() {
+    echo "$(basename $0) - add variable to local.conf"
+    echo "--var - variable name"
+    echo "--value - value of the variable"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --var=*)
+        VAR="${i#*=}"
+        shift
+        ;;
+    --value=*)
+        VAL="${i#*=}"
+        VAL=$(echo ${VAL} | sed -e 's/^"//' -e 's/"$//')
+        # If it's a file read content from it
+        [ -f ${VAL} ] && VAL=$(cat ${VAL} | tr '\n' ' ')
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${VAR}" ] && usage && exit 1
+[ -z "${VAL}" ] && usage && exit 1
+
+source ${THISDIR}/utils
+
+setup_bitbake
+echo "${VAR} = \"${VAL}\"" >> conf/local.conf

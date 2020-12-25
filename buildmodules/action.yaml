@@ -1,0 +1,16 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'build modules'
+description: 'builds meta-sca modules'
+inputs:
+  parameter-file: 
+    description: 'Parameter file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: build
+      run: |
+        /github/actions/scripts/buildntest \
+        --modfile=${WORKSPACE}/sources/meta-sca/test/lang_${{ inputs.parameter-file }}.txt
+      shell: bash

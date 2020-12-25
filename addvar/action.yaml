@@ -1,0 +1,20 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+name: 'Add variable to local.conf'
+description: '...with a value of course'
+inputs:
+  variable: 
+    description: 'variable name'
+    required: true
+  value: 
+    description: 'variable value or file'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: build
+      run: |
+        /github/actions/scripts/addvar \
+        --var=${{ inputs.variable }} \
+        --value="${{ inputs.value }}"
+      shell: bash

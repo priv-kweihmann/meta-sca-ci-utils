@@ -1,0 +1,78 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+URL=""
+BRANCH=""
+CODIR="${WORKSPACE}/sources"
+ADDLAYER="1"
+ADDSUFFIX=""
+REMGIT="1"
+
+THISDIR="$(dirname $0)"
+
+usage() {
+    echo "$(basename $0) - checkout layer"
+    echo "--addlayer - add layer via bitbake (set 0 to disable)"
+    echo "--removegit - remove git info (set 0 to disable)"
+    echo "--url - URL to checkout"
+    echo "--workspace - folder to checkout to"
+    echo "--addlayersuffix - add layer via bitbake suffix"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --url=*)
+        URL="${i#*=}"
+        shift
+        ;;
+    --branch=*)
+        BRANCH="${i#*=}"
+        shift
+        ;;
+    --workspace=*)
+        CODIR="${i#*=}"
+        shift
+        ;;
+    --addlayer=*)
+        ADDLAYER="${i#*=}"
+        shift
+        ;;
+    --addlayersuffix=*)
+        ADDSUFFIX="${i#*=}"
+        shift
+        ;;
+    --removegit=*)
+        REMGIT="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${URL}" ] && usage && exit 1
+[ -z "${BRANCH}" ] && usage && exit 1
+
+cd ${WORKSPACE}
+
+source ${THISDIR}/utils
+
+_LAYER_NAME=$(get_folder_from_url ${URL})
+
+mkdir -p ${CODIR}
+
+${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} "${CODIR}/${_LAYER_NAME}"
+[ "${REMGIT}" -ne "0" ] && rm -rf "${CODIR}/${_LAYER_NAME}/.git"
+
+if [ "${ADDLAYER}" -ne "0" ]; then
+    setup_bitbake
+    bitbake-layers add-layer "${CODIR}/${_LAYER_NAME}${ADDSUFFIX}"
+fi

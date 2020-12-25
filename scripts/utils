@@ -1,0 +1,59 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2020, Konrad Weihmann
+
+get_folder_from_url() {
+    echo $(echo $1 | rev | cut -d '/' -f 1 | rev | sed 's|\.git$||g')
+}
+
+has_bitbake() {
+    bitbake --help > /dev/null 2>&1
+    echo $?
+}
+
+setup_bitbake() {
+    [ -z "${TOPDIR}" ] && TOPDIR=$PWD
+    [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+    if [ "$(has_bitbake)" -ne "0" ]; then
+        [ "$PWD" != "${TOPDIR}" ] && cd ${TOPDIR}
+        source ${WORKSPACE}/sources/poky/oe-init-build-env > /dev/null 2>&1
+    fi
+}
+
+clean_sock_files() {
+    setup_bitbake
+    rm -f bitbake.sock || true
+    rm -f bitbake.lock || true
+}
+
+get_var_from_bitbake() {
+    setup_bitbake
+    _needle=${1}
+    _retval=""
+    eval $(bitbake busybox -e | grep "^${_needle}" | head -n1)
+    if set | grep -q "^${_needle}="; then
+        eval "_retval="\$${_needle}""
+    fi
+    clean_sock_files
+    echo "${_retval}"
+}
+
+clean_download_dir() {
+    dldir="$(get_var_from_bitbake DL_DIR)"
+    [ ! -z "${dldir}" ] && rm -rf ${dldir}
+}
+
+clean_temp_dirs() {
+    tmpdir="$(get_var_from_bitbake TMPDIR)"
+    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -name "temp" -exec rm -rf {} \; || true
+}
+
+clean_all() {
+    clean_download_dir
+    clean_temp_dirs
+    clean_sock_files
+}
+
+clean_all_but_deploy() {
+    tmpdir="$(get_var_from_bitbake TMPDIR)"
+    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -maxdepth 1 -mindepth 1 -not -name "deploy" -exec rm -rf {} \; || true
+}
