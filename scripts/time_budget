@@ -22,7 +22,7 @@ echo "### Remaining time budget: ${_timeout}s"
 
 _start=$( now )
 set +e
-timeout --foreground --kill-after=${_killto}s ${_timeout}s $@
+timeout --foreground --kill-after=${_killto}s ${_timeout}s $@ 2>&1
 retval=$?
 set -e
 _end=$( now )
