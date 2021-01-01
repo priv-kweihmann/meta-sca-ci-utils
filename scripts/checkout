@@ -61,15 +61,14 @@ done
 [ -z "${URL}" ] && usage && exit 1
 [ -z "${BRANCH}" ] && usage && exit 1
 
-cd ${WORKSPACE}
-
 source ${THISDIR}/utils
 
 _LAYER_NAME=$(get_folder_from_url ${URL})
 
+[ -e "${CODIR}/${_LAYER_NAME}" ] && rm -rf "${CODIR}/${_LAYER_NAME}"
 mkdir -p ${CODIR}
 
-${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} "${CODIR}/${_LAYER_NAME}"
+${THISDIR}/time_budget git clone ${URL} --verbose -b ${BRANCH} --single-branch "${CODIR}/${_LAYER_NAME}" 2>&1
 [ "${REMGIT}" -ne "0" ] && rm -rf "${CODIR}/${_LAYER_NAME}/.git"
 
 if [ "${ADDLAYER}" -ne "0" ]; then
