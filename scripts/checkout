@@ -2,6 +2,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 # Copyright (c) 2020, Konrad Weihmann
 set -e
+exec 2>&1
 
 [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
 
@@ -74,5 +75,5 @@ ${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} "${CODIR}/${_LAYER_NAME}"
 
 if [ "${ADDLAYER}" -ne "0" ]; then
     setup_bitbake
-    bitbake-layers add-layer "${CODIR}/${_LAYER_NAME}${ADDSUFFIX}"
+    bitbake-layers add-layer "${CODIR}/${_LAYER_NAME}${ADDSUFFIX}" 2>&1
 fi
