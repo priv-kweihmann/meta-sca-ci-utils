@@ -69,7 +69,7 @@ _LAYER_NAME=$(get_folder_from_url ${URL})
 
 mkdir -p ${CODIR}
 
-${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} ${CODIR}/${_LAYER_NAME}
+${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} ${CODIR}/${_LAYER_NAME} 2>&1
 [ "${REMGIT}" -ne "0" ] && rm -rf ${CODIR}/${_LAYER_NAME}/.git
 
 if [ "${ADDLAYER}" -ne "0" ]; then
