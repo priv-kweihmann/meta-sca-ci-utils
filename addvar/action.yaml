@@ -9,6 +9,10 @@ inputs:
   value: 
     description: 'variable value or file'
     required: true
+  operation: 
+    description: 'operation to perform'
+    required: false
+    default: " = "
 runs:
   using: "composite"
   steps:

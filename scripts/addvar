@@ -7,6 +7,7 @@ set -e
 
 VAR=""
 VAL=""
+OPER=" = "
 
 THISDIR="$(dirname $0)"
 
@@ -23,6 +24,10 @@ do
 case $i in
     --var=*)
         VAR="${i#*=}"
+        shift
+        ;;
+    --operation=*)
+        OPER="${i#*=}"
         shift
         ;;
     --value=*)
@@ -44,4 +49,4 @@ done
 source ${THISDIR}/utils
 
 setup_bitbake
-echo "${VAR} = \"${VAL}\"" >> conf/local.conf
+echo "${VAR}${OPER}\"${VAL}\"" >> conf/local.conf
