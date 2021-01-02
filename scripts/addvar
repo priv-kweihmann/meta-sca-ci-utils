@@ -15,6 +15,7 @@ usage() {
     echo "$(basename $0) - add variable to local.conf"
     echo "--var - variable name"
     echo "--value - value of the variable"
+    echo "--operation - operation to perform"
 }
 
 [ "$#" -eq "0" ] && usage && exit 0
