@@ -54,5 +54,6 @@ source ${THISDIR}/utils
 
 setup_bitbake
 sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR)"
-${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/check_results ${sca_export_dir} ${MODFILE}
+[ -z "${sca_export_dir}" ] && echo "Can't determine the SCA_EXPORT_DIR" && exit 1
+${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/check_results "${sca_export_dir}" ${MODFILE}
 [ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true
