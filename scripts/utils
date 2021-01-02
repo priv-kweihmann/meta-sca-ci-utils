@@ -15,7 +15,7 @@ setup_bitbake() {
     [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
     if [ "$(has_bitbake)" -ne "0" ]; then
         [ "$PWD" != "${TOPDIR}" ] && cd ${TOPDIR}
-        source ${WORKSPACE}/sources/poky/oe-init-build-env
+        source ${WORKSPACE}/sources/poky/oe-init-build-env > /dev/null 2>&1
     fi
 }
 
@@ -27,9 +27,14 @@ clean_sock_files() {
 
 get_var_from_bitbake() {
     setup_bitbake
-    retval=$(eval $(bitbake busybox -e | grep "^${1}" | head -n1))
+    _needle=${1}
+    _retval=""
+    eval $(bitbake busybox -e | grep "^${_needle}" | head -n1)
+    if set | grep -q "^${_needle}="; then
+        eval "_retval="\$${_needle}""
+    fi
     clean_sock_files
-    echo "${retval}"
+    echo "${_retval}"
 }
 
 clean_download_dir() {
