@@ -56,8 +56,8 @@ setup_bitbake
 mkdir -p ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/
 ${THISDIR}/time_budget ${WORKSPACE}/sources/${WEBREPO}/tools/report ${_sca_export_dir} ${_sca_export_find_dir} \
     ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/${MODFILENAME}.json
-${THISDIR}/time_budget ${WORKSPACE}/sources/${WEBREPO}/tools/jsonmerge data/${SCABRANCH}/result.json \
-    ${WORKSPACE}/sources/${WEBREPO}/data/${MODFILENAME}/*.json
+${THISDIR}/time_budget ${WORKSPACE}/sources/${WEBREPO}/tools/jsonmerge ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/result.json \
+    ${WORKSPACE}/sources/${WEBREPO}/data/${BRANCH}/*.json
 
 # Export via git
 cd ${WORKSPACE}/sources/${WEBREPO}
