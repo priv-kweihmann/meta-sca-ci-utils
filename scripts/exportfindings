@@ -65,6 +65,6 @@ git add .
 git config --local user.email "web@deploy.bot"
 git config --local user.name "Webdeploy bot"
 git remote rm origin
-git remote add origin https://priv-kweihmann:${EXPORT_BOT_WEBSECRET}@github.com/${WEBREPO}.git
+git remote add origin https://priv-kweihmann:${EXPORT_BOT_WEBSECRET}@github.com/priv-kweihmann/${WEBREPO}.git
 git diff --quiet && git diff --staged --quiet || (git commit --amend -m "Update findings"; git push origin master --force) || true
 cd -
