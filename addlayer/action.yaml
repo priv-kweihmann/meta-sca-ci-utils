@@ -17,6 +17,10 @@ inputs:
     description: 'suffix to append when running add-layer'
     required: false
     default: ""
+  remove-git:
+    description: 'remove git information'
+    required: false
+    default: "1"
 runs:
   using: "composite"
   steps:
@@ -26,6 +30,7 @@ runs:
         --branch=${{ inputs.branch }} \
         --addlayer=${{ inputs.add-layer }} \
         --addlayersuffix=${{ inputs.add-layer-suffix }} \
-        --url=${{ inputs.repo }}
+        --url=${{ inputs.repo }} \
+        --removegit=${{ inputs.remove-git }}
       shell: bash
  
