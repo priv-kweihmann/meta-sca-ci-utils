@@ -1,0 +1,28 @@
+name: 'Perform package upgrade check'
+description: 'does check if a bitbake recipe needs an upgrade'
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+inputs:
+  blacklist: 
+    description: 'File listing the recipes to ignore'
+    required: true
+  user:
+    description: 'User to create issue in GH'
+    required: true
+  deploy-token:
+    description: 'Github token for issue creation'
+    required: true
+  backoff-time:
+    description: 'Time in seconds to wait before retrying upstream check'
+    required: false
+    default: "60"
+runs:
+  using: "composite"
+  steps:
+    - name: package upgrade check
+      run: |
+        EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} /github/actions/scripts/pkgcheck \
+        --blacklistfile=${{ inputs.blacklist }} \
+        --user=${{ inputs.user }} \
+        --backoff=${{ inputs.backoff-time }}
+      shell: bash

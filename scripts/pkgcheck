@@ -1,0 +1,56 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+THISDIR="$(dirname $0)"
+
+BLACKLIST=""
+USER=""
+BACKOFF_TIME="60"
+
+usage() {
+    echo "$(basename $0) - perform package upgrade check"
+    echo "--backoff - Time in seconds to wait before retying upstream check"
+    echo "--blacklistfile - File listing packages to ignore"
+    echo "--user - GH user for creating issues"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --backoff=*)
+        BACKOFF_TIME="${i#*=}"
+        shift
+        ;;
+    --blacklistfile=*)
+        BLACKLIST="${i#*=}"
+        shift
+        ;;
+    --user=*)
+        USER="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${BLACKLIST}" ] && usage && exit 1
+[ -z "${USER}" ] && usage && exit 1
+[ -z "${EXPORT_BOT_WEBSECRET}" ] && echo "Password token not set, can't continue" && exit 1
+
+source ${THISDIR}/utils
+
+setup_bitbake
+
+# perform package upgrade check
+${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/scripts/check_pkgs.py \
+    --blacklistfile=${WORKSPACE}/sources/meta-sca/scripts/${BLACKLIST} 
+    --backoff=${BACKOFF_TIME} \
+    ${USER} ${EXPORT_BOT_WEBSECRET}
