@@ -51,6 +51,6 @@ setup_bitbake
 
 # perform package upgrade check
 ${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/scripts/check_pkgs.py \
-    --blacklistfile=${WORKSPACE}/sources/meta-sca/scripts/${BLACKLIST} 
+    --blacklistfile=${WORKSPACE}/sources/meta-sca/scripts/${BLACKLIST} \
     --backoff=${BACKOFF_TIME} \
     ${USER} ${EXPORT_BOT_WEBSECRET}
