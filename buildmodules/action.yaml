@@ -6,11 +6,16 @@ inputs:
   parameter-file: 
     description: 'Parameter file'
     required: true
+  repo:
+    description: 'Repo to use'
+    required: false
+    default: "meta-sca"
 runs:
   using: "composite"
   steps:
     - name: build
       run: |
         /github/actions/scripts/buildntest \
-        --modfile=${WORKSPACE}/sources/meta-sca/test/lang_${{ inputs.parameter-file }}.txt
+        --modfile=${WORKSPACE}/sources/${{ inputs.repo }}/test/lang_${{ inputs.parameter-file }}.txt \
+        --repo=${{ inputs.repo }}
       shell: bash

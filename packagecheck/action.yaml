@@ -16,6 +16,10 @@ inputs:
     description: 'Time in seconds to wait before retrying upstream check'
     required: false
     default: "60"
+  repo:
+    description: 'Repo to use'
+    required: false
+    default: "meta-sca"
 runs:
   using: "composite"
   steps:
@@ -24,5 +28,6 @@ runs:
         EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} /github/actions/scripts/pkgcheck \
         --blacklistfile=${{ inputs.blacklist }} \
         --user=${{ inputs.user }} \
-        --backoff=${{ inputs.backoff-time }}
+        --backoff=${{ inputs.backoff-time }} \
+        --repo=${{ inputs.repo }}
       shell: bash

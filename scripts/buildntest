@@ -9,6 +9,7 @@ MODFILE=""
 CLEAN="1"
 BUILDNTEST_PRESERVECACHE="1"
 BUILDNTEST_NOTEST="1"
+REPO="meta-sca"
 
 THISDIR="$(dirname $0)"
 
@@ -18,6 +19,7 @@ usage() {
     echo "--clean - cleanup afterwards (set 0 to disable)"
     echo "--preservecache - Preserve existing caches (set 0 to disable)"
     echo "--notest - Don't test results (set 0 to disable)"
+    echo "--repo - repo name to use (default: meta-sca)"
 }
 
 [ "$#" -eq "0" ] && usage && exit 0
@@ -41,6 +43,10 @@ case $i in
         BUILDNTEST_NOTEST="${i#*=}"
         shift
         ;;
+    --repo=*)
+        REPO="${i#*=}"
+        shift
+        ;;
     *)
         usage && exit 0
         ;;
@@ -55,5 +61,5 @@ export BUILDNTEST_PRESERVECACHE
 export BUILDNTEST_NOTEST
 
 setup_bitbake
-${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/buildntest ${MODFILE}
+${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/test/buildntest ${MODFILE}
 [ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true

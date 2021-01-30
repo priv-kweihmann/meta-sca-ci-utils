@@ -1,16 +1,21 @@
 # SPDX-License-Identifier: BSD-2-Clause
 # Copyright (c) 2020, Konrad Weihmann
-name: 'Bitbake build'
-description: '...meta-sca build'
+name: 'Test result'
+description: 'Test the results of the bitbake run'
 inputs:
   parameter-file:
     description: 'Parameter file'
     required: true
+  repo:
+    description: 'Repo to use'
+    required: false
+    default: "meta-sca"
 runs:
   using: "composite"
   steps:
     - name: test results
       run: |
         /github/actions/scripts/checkresults \
-          --modfile=${WORKSPACE}/sources/meta-sca/test/lang_${{ inputs.parameter-file }}.txt
+          --modfile=${WORKSPACE}/sources/${{ inputs.repo }}/test/lang_${{ inputs.parameter-file }}.txt \
+          --repo=${{ inputs.repo }}
       shell: bash

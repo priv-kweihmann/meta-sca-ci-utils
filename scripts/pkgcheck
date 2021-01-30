@@ -10,12 +10,14 @@ THISDIR="$(dirname $0)"
 BLACKLIST=""
 USER=""
 BACKOFF_TIME="60"
+REPO="meta-sca"
 
 usage() {
     echo "$(basename $0) - perform package upgrade check"
     echo "--backoff - Time in seconds to wait before retying upstream check"
     echo "--blacklistfile - File listing packages to ignore"
     echo "--user - GH user for creating issues"
+    echo "--repo - repo name to use (default: meta-sca)"
 }
 
 [ "$#" -eq "0" ] && usage && exit 0
@@ -35,6 +37,10 @@ case $i in
         USER="${i#*=}"
         shift
         ;;
+    --repo=*)
+        REPO="${i#*=}"
+        shift
+        ;;
     *)
         usage && exit 0
         ;;
@@ -50,7 +56,7 @@ source ${THISDIR}/utils
 setup_bitbake
 
 # perform package upgrade check
-${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/scripts/check_pkgs.py \
-    --blacklistfile=${WORKSPACE}/sources/meta-sca/scripts/${BLACKLIST} \
+${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/scripts/check_pkgs.py \
+    --blacklistfile=${WORKSPACE}/sources/${REPO}/scripts/${BLACKLIST} \
     --backoff=${BACKOFF_TIME} \
     ${USER} ${EXPORT_BOT_WEBSECRET}

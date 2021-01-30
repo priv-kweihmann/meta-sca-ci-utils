@@ -7,7 +7,7 @@ set -e
 
 MODFILE=""
 CLEAN="1"
-SOURCES="${WORKSPACE}/sources/meta-sca/"
+REPO="meta-sca"
 
 THISDIR="$(dirname $0)"
 
@@ -15,7 +15,7 @@ usage() {
     echo "$(basename $0) - check results of modules"
     echo "--modfile - modfile to test"
     echo "--clean - cleanup afterwards (set 0 to disable)"
-    echo "--src - base path to meta-sca"
+    echo "--repo - repo name to use (default: meta-sca)"
 }
 
 [ "$#" -eq "0" ] && usage && exit 0
@@ -31,8 +31,8 @@ case $i in
         CLEAN="${i#*=}"
         shift
         ;;
-    --src=*)
-        SOURCES="${i#*=}"
+    --repo=*)
+        REPO="${i#*=}"
         shift
         ;;
     *)
@@ -44,8 +44,7 @@ done
 [ -z "${MODFILE}" ] && usage && exit 1
 
 if [ ! -f "${MODFILE}" ]; then
-    MODFILE=$(find ${SOURCES}/test -type f -name "*${MODFILE}*" | head -n1 )
-    
+    MODFILE=$(find ${WORKSPACE}/sources/${REPO}/test -type f -name "*${MODFILE}*" | head -n1 )
 fi
 
 [ -z "${MODFILE}" ] && echo "--modfile not found" && exit 2
@@ -55,5 +54,5 @@ source ${THISDIR}/utils
 setup_bitbake
 sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR)"
 [ -z "${sca_export_dir}" ] && echo "Can't determine the SCA_EXPORT_DIR" && exit 1
-${THISDIR}/time_budget ${WORKSPACE}/sources/meta-sca/test/check_results "${sca_export_dir}" ${MODFILE}
+${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/test/check_results "${sca_export_dir}" ${MODFILE}
 [ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true
