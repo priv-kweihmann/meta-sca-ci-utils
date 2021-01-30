@@ -1,7 +1,7 @@
-name: 'export results'
-description: '...meta-sca build'
 # SPDX-License-Identifier: BSD-2-Clause
 # Copyright (c) 2020, Konrad Weihmann
+name: 'export results'
+description: '...export the web results'
 inputs:
   branch: 
     description: 'SCA branch to use'
