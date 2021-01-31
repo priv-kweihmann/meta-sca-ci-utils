@@ -47,6 +47,8 @@ source ${THISDIR}/utils
 
 setup_bitbake
 ${THISDIR}/time_budget bitbake ${TARGET}
-[ "${TAPGEN}" -ne "0" ] && sudo ${WORKSPACE}/sources/poky/scripts/runqemu-gen-tapdevs `id -u` `id -g` 1 $(PWD)/tmp-glibc/sysroots-components/x86_64/qemu-helper-native/usr/bin
+_componentsdir="$(get_var_from_bitbake COMPONENTS_DIR)"
+## FIXME: don't assume a TMPDIR - get it from bitbake
+[ "${TAPGEN}" -ne "0" ] && sudo ${WORKSPACE}/sources/poky/scripts/runqemu-gen-tapdevs `id -u` `id -g` 1 ${_componentsdir}/x86_64/qemu-helper-native/usr/bin
 ${THISDIR}/time_budget bitbake ${TARGET} -c testimage
 [ "${CLEAN}" -ne "0" ] && clean_all || true
