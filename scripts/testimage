@@ -1,0 +1,52 @@
+#!/bin/bash
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+set -e
+
+[ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
+
+TARGET=""
+CLEAN="1"
+TAPGEN="1"
+
+THISDIR="$(dirname $0)"
+
+usage() {
+    echo "$(basename $0) - run a testimage"
+    echo "--target - target to build"
+    echo "--tapgen - run tapgen"
+    echo "--clean - cleanup afterwards (set 0 to disable)"
+}
+
+[ "$#" -eq "0" ] && usage && exit 0
+
+for i in "$@"
+do
+case $i in
+    --target=*)
+        TARGET="${i#*=}"
+        shift
+        ;;
+    --clean=*)
+        CLEAN="${i#*=}"
+        shift
+        ;;
+    --tapgen=*)
+        TAPGEN="${i#*=}"
+        shift
+        ;;
+    *)
+        usage && exit 0
+        ;;
+esac
+done
+
+[ -z "${TARGET}" ] && usage && exit 1
+
+source ${THISDIR}/utils
+
+setup_bitbake
+${THISDIR}/time_budget bitbake ${TARGET}
+[ "${TAPGEN}" -ne "0" ] && sudo ${WORKSPACE}/sources/poky/scripts/runqemu-gen-tapdevs `id -u` `id -g` 1 $(PWD)/tmp-glibc/sysroots-components/x86_64/qemu-helper-native/usr/bin
+${THISDIR}/time_budget bitbake ${TARGET} -c testimage
+[ "${CLEAN}" -ne "0" ] && clean_all || true

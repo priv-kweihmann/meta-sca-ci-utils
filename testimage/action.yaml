@@ -1,0 +1,26 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+name: 'bitbake testimage'
+description: 'builds a single image and then run testimage class on it'
+inputs:
+  target: 
+    description: 'image to check'
+    required: true
+  clean: 
+    description: 'cleanup afterwards'
+    required: false
+    default: "1"
+  tapgen: 
+    description: 'run tapgen'
+    required: false
+    default: "1"
+runs:
+  using: "composite"
+  steps:
+    - name: build
+      run: |
+        /github/actions/scripts/testimage \
+        --target=${{ inputs.target }} \
+        --clean=${{ inputs.clean }} \
+        --tapgen=${{ input.tapgen }}
+      shell: bash
