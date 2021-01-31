@@ -22,5 +22,5 @@ runs:
         /github/actions/scripts/testimage \
         --target=${{ inputs.target }} \
         --clean=${{ inputs.clean }} \
-        --tapgen=${{ input.tapgen }}
+        --tapgen=${{ inputs.tapgen }}
       shell: bash
