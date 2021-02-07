@@ -21,11 +21,22 @@ def create_parser():
                         help="addtional constants file")
     parser.add_argument(
         "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
+    parser.add_argument("--pullrequest", default=os.environ.get("GITHUB_EVENT_PATH", ""), help="id of pullrequest")
     parser.add_argument("sources", help="source dir to scan")
     parser.add_argument("username", help="GitHub username")
     parser.add_argument("repo", help="in format user/repo")
-    parser.add_argument("pullrequest", help="id of pullrequest")
-    return parser.parse_args()
+
+    _tmp = parser.parse_args()
+    # try to look at what has been passed a reference
+    if not _tmp.pullrequest.isdigit():
+        import json
+        try:
+            with open(_tmp.pullrequest) as i:
+                _cnt = json.read(i)
+                _tmp.pullrequest = _cnt["pull_request"]["number"]
+        except:
+            pass
+    return _tmp
 
 
 def run_tool(args, pullreq):
