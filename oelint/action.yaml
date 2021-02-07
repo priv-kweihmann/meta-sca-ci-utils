@@ -35,8 +35,11 @@ runs:
   steps:
     - name: install
       run: |
+        sudo pip3 install --upgrade pip
         sudo pip3 install setuptools
-        sudo pip3 install oelint-adv github3
+        sudo pip3 install requests
+        sudo pip3 install oelint-adv
+        sudo pip3 install github3
       shell: bash
     - name: run
       run: |
