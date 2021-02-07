@@ -29,16 +29,15 @@ def create_parser():
 
     _tmp = parser.parse_args()
 
-    print(str(_tmp.pullrequest))
     # try to look at what has been passed a reference
-    if not _tmp.pullrequest.isdigit():
-        import json
-        try:
-            with open(_tmp.pullrequest) as i:
-                _cnt = json.read(i)
-                _tmp.pullrequest = _cnt["pull_request"]["number"]
-        except:
-            pass
+    import json
+    try:
+        with open(_tmp.pullrequest) as i:
+            _cnt = json.read(i)
+            print(_cnt)
+            _tmp.pullrequest = _cnt["pull_request"]["number"]
+    except:
+        pass
     return _tmp
 
 
