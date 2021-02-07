@@ -21,7 +21,7 @@ def create_parser():
                         help="addtional constants file")
     parser.add_argument(
         "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
-    parser.add_argument("--pullrequest", default=os.environ.get("GITHUB_EVENT_PATH", ""), help="id of pullrequest")
+    parser.add_argument("--pullrequest", default=os.environ.get("GITHUB_EVENT_PATH", "abc"), help="id of pullrequest")
     parser.add_argument("sources", help="source dir to scan")
     parser.add_argument("username", help="GitHub username")
     parser.add_argument("ghuser", help="github profile of repo")
