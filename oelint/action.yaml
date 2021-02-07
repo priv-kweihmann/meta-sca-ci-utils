@@ -43,7 +43,7 @@ runs:
       shell: bash
     - name: run
       run: |
-        EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} \
+        EXPORT_BOT_WEBSECRET=${{ inputs.token }} \
         /github/actions/scripts/oelint \
         --rulesdir="${{ inputs.custom-rule-dir }}" \
         --configfile="${{ inputs.config-file }}" \
