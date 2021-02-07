@@ -17,6 +17,8 @@ def create_parser():
                         help="additional rules dir")
     parser.add_argument("--configfile", default=None,
                         help="addtional configuration file")
+    parser.add_argument("--constantfile", default=None,
+                        help="addtional constants file")
     parser.add_argument(
         "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
     parser.add_argument("sources", help="source dir to scan")
@@ -29,9 +31,11 @@ def create_parser():
 def run_tool(args, pullreq):
     _args = ["oelint-adv"]
     if args.rulesdir:
-        _args += ["--customrules", args.rulesdir]
+        _args += ["--customrules={}".format(args.rulesdir)]
+    if args.constantfile:
+        _args += ["--constantfile={}".format(args.constantfile)]
     if args.configfile:
-        _args += ["----rulefile", args.configfile]
+        _args += ["--rulefile={}".format(args.configfile)]
     for _f in pullreq.files():
         _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
         _path, _ext = os.path.splitext(_fullpath)

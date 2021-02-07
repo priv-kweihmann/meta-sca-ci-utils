@@ -14,6 +14,10 @@ inputs:
     description: 'custom configuration file'
     required: false
     default: ''
+  constant-file: 
+    description: 'custom constant file'
+    required: false
+    default: ''
   username:
     description: 'username to use for comments'
     required: true
@@ -42,6 +46,7 @@ runs:
         /github/actions/scripts/oelint \
         --rulesdir="${{ inputs.custom-rule-dir }}" \
         --configfile="${{ inputs.config-file }}" \
+        --constantfile="${{ inputs.constant-file }}" \
         "${{ inputs.sources }}" \
         "${{ inputs.username }}" \
         "${{ inputs.pull-request-repo-user }}/${{ inputs.pull-request-repo }}" \
