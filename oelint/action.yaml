@@ -30,14 +30,6 @@ inputs:
   pull-request-repo:
     description: 'github repo'
     required: true
-  scripts-export-path:
-    description: 'Path to symlink the scripts to'
-    required: false
-    default: "/github/actions/scripts"
-  actions-needle:
-    description: 'path to look for'
-    required: false
-    default: "meta-sca-ci-utils"
 runs:
   using: "composite"
   steps:
@@ -48,13 +40,6 @@ runs:
         sudo pip3 install requests
         sudo pip3 install oelint-adv
         sudo pip3 install github3.py
-      shell: bash
-    - name: symlink actions
-      run: |
-        ACTIONS_DIR=$(find / -type d -name ${{ inputs.actions-needle }} | head -n1)
-        sudo mkdir -p $(dirname ${{ inputs.scripts-export-path }})
-        sudo ln -sf ${ACTIONS_DIR}/scripts ${{ inputs.scripts-export-path }}
-        ls -lisa ${{ inputs.scripts-export-path }}
       shell: bash
     - name: run
       run: |
