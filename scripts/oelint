@@ -27,9 +27,9 @@ def create_parser():
     parser.add_argument("ghuser", help="github profile of repo")
     parser.add_argument("repo", help="name of the repo")
 
-    print(str(_tmp.pullrequest))
-
     _tmp = parser.parse_args()
+
+    print(str(_tmp.pullrequest))
     # try to look at what has been passed a reference
     if not _tmp.pullrequest.isdigit():
         import json
