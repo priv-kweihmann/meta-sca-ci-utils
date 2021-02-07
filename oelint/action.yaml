@@ -50,5 +50,6 @@ runs:
         --constantfile="${{ inputs.constant-file }}" \
         "${{ inputs.sources }}" \
         "${{ inputs.username }}" \
-        "${{ inputs.pull-request-repo-user }}/${{ inputs.pull-request-repo }}"
+        "${{ inputs.pull-request-repo-user }}" \
+        "${{ inputs.pull-request-repo }}"
       shell: bash

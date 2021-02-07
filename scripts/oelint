@@ -24,7 +24,8 @@ def create_parser():
     parser.add_argument("--pullrequest", default=os.environ.get("GITHUB_EVENT_PATH", ""), help="id of pullrequest")
     parser.add_argument("sources", help="source dir to scan")
     parser.add_argument("username", help="GitHub username")
-    parser.add_argument("repo", help="in format user/repo")
+    parser.add_argument("ghuser", help="github profile of repo")
+    parser.add_argument("repo", help="name of the repo")
 
     _tmp = parser.parse_args()
     # try to look at what has been passed a reference
@@ -85,7 +86,7 @@ def post_findings(args, pullreq):
 
 def get_pullrequest(args):
     login = github3.login(args.username, args.token)
-    repo = login.repository(*(args.repo.split("/")))
+    repo = login.repository(args.ghuser, args.repo)
     return repo.pull_request(args.pullrequest)
 
 
