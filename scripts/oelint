@@ -34,10 +34,11 @@ def create_parser():
     try:
         with open(_tmp.pullrequest) as i:
             _cnt = json.read(i)
-            print(_cnt)
             _tmp.pullrequest = _cnt["pull_request"]["number"]
-    except:
+    except Exception as e:
+        print(e)
         pass
+    print(_tmp.pullrequest)
     return _tmp
 
 
