@@ -1,0 +1,84 @@
+#!/bin/usr/env python3
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+
+import argparse
+import glob
+import os
+import re
+import subprocess
+
+import github3
+
+
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--rulesdir", default=None,
+                        help="additional rules dir")
+    parser.add_argument("--configfile", default=None,
+                        help="addtional configuration file")
+    parser.add_argument(
+        "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
+    parser.add_argument("sources", help="source dir to scan")
+    parser.add_argument("username", help="GitHub username")
+    parser.add_argument("repo", help="in format user/repo")
+    parser.add_argument("pullrequest", help="id of pullrequest")
+    return parser.parse_args()
+
+
+def run_tool(args, pullreq):
+    _args = ["oelint-adv"]
+    if args.rulesdir:
+        _args += ["--customrules", args.rulesdir]
+    if args.configfile:
+        _args += ["----rulefile", args.configfile]
+    for _f in pullreq.files():
+        _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
+        _path, _ext = os.path.splitext(_fullpath)
+        if _ext in [".bb", ".bbappend"]:
+            _args.append(_fullpath)
+    try:
+        out = subprocess.check_output(
+            _args, universal_newlines=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        out = e.stdout or ""
+    return out
+
+
+def create_findings(args, pullreq):
+    _input = run_tool(args, pullreq)
+    _findings = []
+    pattern = r"^(?P<file>.*?):(?P<line>\d+):(?P<severity>(warning|error|info)):(?P<id>.*?):(?P<message>.*)$"
+    for m in re.finditer(pattern, _input, re.MULTILINE):
+        _findings.append({
+            "position": int(m.group("line")),
+            "path": os.path.relpath(m.group("file"), args.sources),
+            "body": "potential issue: " + m.group("message"),
+            "commit_id": pullreq.head.sha
+        })
+    return _findings
+
+
+def post_findings(args, pullreq):
+    for f in create_findings(args, pullreq):
+        try:
+            pullreq.create_review_comment(
+                f["body"], f["commit_id"], f["path"], f["position"])
+        except:
+            pass
+
+
+def get_pullrequest(args):
+    login = github3.login(args.username, args.token)
+    repo = login.repository(*(args.repo.split("/")))
+    return repo.pull_request(args.pullrequest)
+
+
+def main():
+    _args = create_parser()
+    post_findings(_args, get_pullrequest(_args))
+    pass
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,49 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+name: 'Run oelint-adv'
+description: 'run oelint'
+inputs:
+  sources:
+    description: 'dir with the sources'
+    required: true
+  custom-rule-dir: 
+    description: 'custom rules directory'
+    required: false
+    default: ''
+  config-file: 
+    description: 'custom configuration file'
+    required: false
+    default: ''
+  username:
+    description: 'username to use for comments'
+    required: true
+  token:
+    description: 'token to use for comments'
+    required: true
+  pull-request-number:
+    description: 'pull request number'
+    required: true
+  pull-request-repo-user:
+    description: 'github username of repo'
+    required: true
+  pull-request-repo:
+    description: 'github repo'
+    required: true
+runs:
+  using: "composite"
+  steps:
+    - name: install
+      run: |
+        sudo pip3 install oelint-adv github3
+      shell: bash
+    - name: run
+      run: |
+        EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} \
+        /github/actions/scripts/oelint \
+        --rulesdir="${{ inputs.custom-rule-dir }}" \
+        --configfile="${{ inputs.config-file }}" \
+        "${{ inputs.sources }}" \
+        "${{ inputs.username }}" \
+        "${{ inputs.pull-request-repo-user }}/${{ inputs.pull-request-repo }}" \
+        "${{ inputs.pull-request-number }}"
+      shell: bash
