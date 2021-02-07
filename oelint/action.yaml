@@ -34,6 +34,10 @@ inputs:
     description: 'Path to symlink the scripts to'
     required: false
     default: "/github/actions/scripts"
+  actions-needle:
+    description: 'path to look for'
+    required: false
+    default: "/__w/_actions/priv-kweihmann/meta-sca-ci-utils/"
 runs:
   using: "composite"
   steps:
@@ -47,7 +51,7 @@ runs:
       shell: bash
     - name: symlink actions
       run: |
-        ACTIONS_DIR=$(find ${{ inputs.needle }} -type d -name 'scripts' | head -n1)
+        ACTIONS_DIR=$(find ${{ inputs.actions-needle }} -type d -name 'scripts' | head -n1)
         sudo mkdir -p $(dirname ${{ inputs.scripts-export-path }})
         sudo ln -sf ${ACTIONS_DIR} ${{ inputs.scripts-export-path }}
         ls -lisa ${{ inputs.scripts-export-path }}
