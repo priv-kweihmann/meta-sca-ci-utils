@@ -35,6 +35,7 @@ runs:
   steps:
     - name: install
       run: |
+        sudo pip3 install setuptools
         sudo pip3 install oelint-adv github3
       shell: bash
     - name: run
