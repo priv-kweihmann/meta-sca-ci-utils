@@ -7,6 +7,7 @@ import glob
 import os
 import re
 import subprocess
+import sys
 
 import github3
 
@@ -21,7 +22,8 @@ def create_parser():
                         help="addtional constants file")
     parser.add_argument(
         "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
-    parser.add_argument("--pullrequest", default=os.environ.get("GITHUB_EVENT_PATH", "abc"), help="id of pullrequest")
+    parser.add_argument("--pullrequest", default=os.environ.get(
+        "GITHUB_EVENT_PATH", "abc"), help="id of pullrequest")
     parser.add_argument("sources", help="source dir to scan")
     parser.add_argument("username", help="GitHub username")
     parser.add_argument("ghuser", help="github profile of repo")
@@ -43,7 +45,7 @@ def create_parser():
 
 
 def run_tool(args, pullreq):
-    _args = ["oelint-adv"]
+    _args = ["oelint-adv", "--quiet"]
     if args.rulesdir:
         _args += ["--customrules={}".format(args.rulesdir)]
     if args.constantfile:
@@ -54,12 +56,15 @@ def run_tool(args, pullreq):
         _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
         _path, _ext = os.path.splitext(_fullpath)
         if _ext in [".bb", ".bbappend"]:
+            print("Checking {}".format(_path))
             _args.append(_fullpath)
     try:
         out = subprocess.check_output(
             _args, universal_newlines=True, stderr=subprocess.STDOUT)
     except subprocess.CalledProcessError as e:
         out = e.stdout or ""
+
+    print(out)
     return out
 
 
@@ -78,12 +83,15 @@ def create_findings(args, pullreq):
 
 
 def post_findings(args, pullreq):
-    for f in create_findings(args, pullreq):
+    _findings = create_findings(args, pullreq)
+    for f in _findings:
         try:
+            print(f)
             pullreq.create_review_comment(
                 f["body"], f["commit_id"], f["path"], f["position"])
         except:
             pass
+    return any(_findings)
 
 
 def get_pullrequest(args):
@@ -94,8 +102,8 @@ def get_pullrequest(args):
 
 def main():
     _args = create_parser()
-    post_findings(_args, get_pullrequest(_args))
-    pass
+    if post_findings(_args, get_pullrequest(_args)):
+        sys.exit(1)
 
 
 if __name__ == '__main__':
