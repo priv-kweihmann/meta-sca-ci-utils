@@ -32,7 +32,7 @@ runs:
       shell: bash
     - name: add user as root
       run: |
-        sudo usermod -a -g root ${{ inputs.user }} 
+        sudo usermod -a -G root ${{ inputs.user }} 
       shell: bash
     - name: pimp github dir permissions
       run: |
