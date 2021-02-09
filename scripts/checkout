@@ -68,8 +68,8 @@ done
 if [ ! -z "${EVENTFILE}" ]; then
     URL=$(jq -r .repository.clone_url ${GITHUB_EVENT_PATH})
     REF=$(jq -r .ref ${GITHUB_EVENT_PATH})
-    [ -z "${REF}" ] && REF=$(jq -r .pull_request.head.sha ${GITHUB_EVENT_PATH})
-    [ -z "${REF}" ] && jq . ${GITHUB_EVENT_PATH}
+    [ "${REF}" == "null" ] && REF=$(jq -r .pull_request.head.sha ${GITHUB_EVENT_PATH})
+    [ "${REF}" == "null" ] && jq . ${GITHUB_EVENT_PATH}
     echo "Using ${REF}@${URL}, taken from event file" 
 fi
 
