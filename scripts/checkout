@@ -11,6 +11,8 @@ CODIR="${WORKSPACE}/sources"
 ADDLAYER="1"
 ADDSUFFIX=""
 REMGIT="1"
+EVENTFILE=""
+REF=""
 
 THISDIR="$(dirname $0)"
 
@@ -19,6 +21,7 @@ usage() {
     echo "--addlayer - add layer via bitbake (set 0 to disable)"
     echo "--removegit - remove git info (set 0 to disable)"
     echo "--url - URL to checkout"
+    echo "--eventfile - extract info from event file"
     echo "--workspace - folder to checkout to"
     echo "--addlayersuffix - add layer via bitbake suffix"
 }
@@ -52,14 +55,23 @@ case $i in
         REMGIT="${i#*=}"
         shift
         ;;
+    --eventfile=*)
+        EVENTFILE="${i#*=}"
+        shift
+        ;;
     *)
         usage && exit 0
         ;;
 esac
 done
 
+if [ -z "${EVENTFILE}" ]; then
+    URL=$(jq .repository.clone_url ${EVENTFILE})
+    REF=$(jq .ref ${EVENTFILE})
+fi
+
 [ -z "${URL}" ] && usage && exit 1
-[ -z "${BRANCH}" ] && usage && exit 1
+[ -z "${BRANCH}" ] && [ -z "${REF}" ] && usage && exit 1
 
 cd ${WORKSPACE}
 
@@ -69,7 +81,12 @@ _LAYER_NAME=$(get_folder_from_url ${URL})
 
 mkdir -p ${CODIR}
 
-${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} ${CODIR}/${_LAYER_NAME} 2>&1
+if [ -z "${REF}" ]; then
+    ${THISDIR}/time_budget git clone ${URL} -b ${BRANCH} ${CODIR}/${_LAYER_NAME} 2>&1
+else
+    ${THISDIR}/time_budget git clone ${URL} ${CODIR}/${_LAYER_NAME} 2>&1
+    git -C ${CODIR}/${_LAYER_NAME} reset --hard ${REF}
+fi
 [ "${REMGIT}" -ne "0" ] && rm -rf ${CODIR}/${_LAYER_NAME}/.git
 
 if [ "${ADDLAYER}" -ne "0" ]; then

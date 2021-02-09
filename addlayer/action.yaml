@@ -21,6 +21,10 @@ inputs:
     description: 'remove git information'
     required: false
     default: "1"
+  gh-event-file:
+    description: 'path to GITHUB_EVENT_PATH'
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -31,6 +35,7 @@ runs:
         --addlayer=${{ inputs.add-layer }} \
         --addlayersuffix=${{ inputs.add-layer-suffix }} \
         --url=${{ inputs.repo }} \
-        --removegit=${{ inputs.remove-git }}
+        --removegit=${{ inputs.remove-git }} \
+        --eventfile=${{ inputs.gh-event-file }}
       shell: bash
  
