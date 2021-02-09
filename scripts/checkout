@@ -65,7 +65,7 @@ case $i in
 esac
 done
 
-if [ -z "${EVENTFILE}" ]; then
+if [ ! -z "${EVENTFILE}" ]; then
     URL=$(jq .repository.clone_url ${EVENTFILE})
     REF=$(jq .ref ${EVENTFILE})
 fi
