@@ -36,5 +36,5 @@ runs:
       shell: bash
     - name: pimp github dir permissions
       run: |
-        sudo chmod -R g=+w /__w/
+        sudo chmod -R 0755 /__w/
       shell: bash
