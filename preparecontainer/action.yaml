@@ -11,6 +11,10 @@ inputs:
     description: 'path to look for'
     required: false
     default: "/__w/_actions/priv-kweihmann/meta-sca-ci-utils/"
+  user:
+    description: 'user running the container'
+    required: false
+    default: "yoctouser"
 runs:
   using: "composite"
   steps:
@@ -25,4 +29,12 @@ runs:
         sudo mkdir -p $(dirname ${{ inputs.scripts-export-path }})
         sudo ln -sf ${ACTIONS_DIR} ${{ inputs.scripts-export-path }}
         ls -lisa ${{ inputs.scripts-export-path }}
+      shell: bash
+    - name: add user as root
+      run: |
+        sudo usermod -a -g root ${{ inputs.user }} 
+      shell: bash
+    - name: pimp github dir permissions
+      run: |
+        sudo chmod -R g=+w /__w/
       shell: bash
