@@ -22,7 +22,7 @@ inputs:
     required: false
     default: "1"
   gh-event-file:
-    description: 'path to GITHUB_EVENT_PATH'
+    description: 'use GITHUB_EVENT_PATH instead'
     required: false
     default: ""
 runs:

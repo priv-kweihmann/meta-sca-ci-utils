@@ -66,8 +66,8 @@ esac
 done
 
 if [ ! -z "${EVENTFILE}" ]; then
-    URL=$(jq .repository.clone_url ${EVENTFILE})
-    REF=$(jq .ref ${EVENTFILE})
+    URL=$(jq .repository.clone_url ${GITHUB_EVENT_PATH})
+    REF=$(jq .ref ${GITHUB_EVENT_PATH})
 fi
 
 [ -z "${URL}" ] && usage && exit 1
