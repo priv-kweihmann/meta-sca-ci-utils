@@ -100,17 +100,19 @@ def get_existing_comments(args, pullrequest):
 def post_findings(args, pullreq):
     _findings = create_findings(args, pullreq)
     _exisiting = get_existing_comments(args, pullreq)
+    actual_new_findings = 0
     for f in _findings:
         if f in _exisiting:
             # Don't double post findings
             continue
         try:
             print(f)
-            # pullreq.create_review_comment(
-            #     f["body"], f["commit_id"], f["path"], f["position"])
+            actual_new_findings += 1
+            pullreq.create_review_comment(
+                f["body"], f["commit_id"], f["path"], f["position"])
         except:
             pass
-    return any(_findings)
+    return actual_new_findings == 0
 
 
 def get_pullrequest(args):
