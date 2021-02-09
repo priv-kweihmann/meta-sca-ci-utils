@@ -81,14 +81,33 @@ def create_findings(args, pullreq):
         })
     return _findings
 
+def get_existing_comments(args, pullrequest):
+    _findings = []
+    for x in pullrequest.review_comments():
+        if x.user.login != args.username:
+            continue
+        _findings.append(
+            {
+                "position": x.position,
+                "path": x.path,
+                "body": x.body_text,
+                "commit_id": x.commit_id
+            }
+        )
+    return _findings
+
 
 def post_findings(args, pullreq):
     _findings = create_findings(args, pullreq)
+    _exisiting = get_existing_comments(args, pullreq)
     for f in _findings:
+        if f in _exisiting:
+            # Don't double post findings
+            continue
         try:
             print(f)
-            pullreq.create_review_comment(
-                f["body"], f["commit_id"], f["path"], f["position"])
+            # pullreq.create_review_comment(
+            #     f["body"], f["commit_id"], f["path"], f["position"])
         except:
             pass
     return any(_findings)
