@@ -94,6 +94,14 @@ def get_existing_comments(args, pullrequest):
                 "commit_id": x.commit_id
             }
         )
+        _findings.append(
+            {
+                "position": x.original_position,
+                "path": x.path,
+                "body": x.body_text,
+                "commit_id": x.commit_id
+            }
+        )
     return _findings
 
 
