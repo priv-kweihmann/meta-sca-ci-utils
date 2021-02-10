@@ -25,6 +25,10 @@ inputs:
     description: 'use GITHUB_EVENT_PATH instead'
     required: false
     default: ""
+  ref:
+    description: 'use specific revision instead of head'
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
@@ -36,6 +40,7 @@ runs:
         --addlayersuffix=${{ inputs.add-layer-suffix }} \
         --url=${{ inputs.repo }} \
         --removegit=${{ inputs.remove-git }} \
-        --eventfile=${{ inputs.gh-event-file }}
+        --eventfile=${{ inputs.gh-event-file }} \
+        --ref=${{ inputs.ref }}
       shell: bash
  

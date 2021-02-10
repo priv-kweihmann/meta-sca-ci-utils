@@ -22,6 +22,7 @@ usage() {
     echo "--removegit - remove git info (set 0 to disable)"
     echo "--url - URL to checkout"
     echo "--eventfile - extract info from event file"
+    echo "--ref - use specific revision instead of head"
     echo "--workspace - folder to checkout to"
     echo "--addlayersuffix - add layer via bitbake suffix"
 }
@@ -57,6 +58,10 @@ case $i in
         ;;
     --eventfile=*)
         EVENTFILE="${i#*=}"
+        shift
+        ;;
+    --ref=*)
+        REF="${i#*=}"
         shift
         ;;
     *)
