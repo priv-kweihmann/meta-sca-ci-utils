@@ -120,7 +120,7 @@ def post_findings(args, pullreq):
                 f["body"], f["commit_id"], f["path"], f["position"])
         except:
             pass
-    return actual_new_findings == 0
+    return actual_new_findings
 
 
 def get_pullrequest(args):
