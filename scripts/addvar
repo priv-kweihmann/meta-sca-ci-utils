@@ -35,7 +35,7 @@ case $i in
         VAL="${i#*=}"
         VAL=$(echo ${VAL} | sed -e 's/^"//' -e 's/"$//')
         # If it's a file read content from it
-        [ -f ${VAL} ] && VAL=$(cat ${VAL} | tr '\n' ' ')
+        [ -f "${VAL}" ] && VAL=$(cat ${VAL} | tr '\n' ' ')
         shift
         ;;
     *)
