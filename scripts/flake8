@@ -1,0 +1,141 @@
+#!/usr/bin/env python3
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2021, Konrad Weihmann
+
+import argparse
+import glob
+import os
+import re
+import subprocess
+import sys
+
+import github3
+
+
+def create_parser():
+    parser = argparse.ArgumentParser()
+    parser.add_argument("--configfile", default=None,
+                        help="addtional configuration file")
+    parser.add_argument(
+        "--token", default=os.environ.get("EXPORT_BOT_WEBSECRET", ""), help="GitHub token")
+    parser.add_argument("--pullrequest", default=os.environ.get(
+        "GITHUB_EVENT_PATH", "abc"), help="id of pullrequest")
+    parser.add_argument("sources", help="source dir to scan")
+    parser.add_argument("username", help="GitHub username")
+    parser.add_argument("ghuser", help="github profile of repo")
+    parser.add_argument("repo", help="name of the repo")
+
+    _tmp = parser.parse_args()
+
+    # try to look at what has been passed a reference
+    import json
+    try:
+        with open(_tmp.pullrequest) as i:
+            _cnt = json.load(i)
+            _tmp.pullrequest = _cnt["pull_request"]["number"]
+    except Exception as e:
+        print(e)
+        pass
+    print("Serving PR: {}".format(_tmp.pullrequest))
+    return _tmp
+
+
+def run_tool(args, pullreq):
+    _args = ["flake8"]
+    if args.configfile:
+        _args += ["--config={}".format(args.configfile)]
+    if not pullreq:
+        _files = glob.glob(args.sources + "/**/*.py", recursive=True)
+        _args += _files
+    else:
+        for _f in pullreq.files():
+            _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
+            _path, _ext = os.path.splitext(_fullpath)
+            if _ext in [".py"]:
+                print("Checking {}".format(_path))
+                _args.append(_fullpath)
+    try:
+        out = subprocess.check_output(
+            _args, universal_newlines=True, stderr=subprocess.STDOUT)
+    except subprocess.CalledProcessError as e:
+        out = e.stdout or ""
+
+    print(out)
+    return out
+
+
+def create_findings(args, pullreq):
+    _input = run_tool(args, pullreq)
+    _findings = []
+    pattern = r"^(?P<file>.*):(?P<line>\d+):(?P<col>\d+):\s*(?P<severity>[A-Z]+)(?P<id>\d+)\s+(?P<message>.*)$"
+    for m in re.finditer(pattern, _input, re.MULTILINE):
+        _findings.append({
+            "position": int(m.group("line")),
+            "path": os.path.relpath(m.group("file"), args.sources),
+            "body": "potential issue: " + m.group("message"),
+            "commit_id": pullreq.head.sha if pullreq else "unknown"
+        })
+    return _findings
+
+
+def get_existing_comments(args, pullrequest):
+    _findings = []
+    if pullrequest:
+        for x in pullrequest.review_comments():
+            if x.user.login != args.username:
+                continue
+            _findings.append(
+                {
+                    "position": x.position,
+                    "path": x.path,
+                    "body": x.body_text,
+                    "commit_id": x.commit_id
+                }
+            )
+            _findings.append(
+                {
+                    "position": x.original_position,
+                    "path": x.path,
+                    "body": x.body_text,
+                    "commit_id": x.commit_id
+                }
+            )
+    return _findings
+
+
+def post_findings(args, pullreq):
+    _findings = create_findings(args, pullreq)
+    _exisiting = get_existing_comments(args, pullreq)
+    actual_new_findings = 0
+    for f in _findings:
+        if f in _exisiting:
+            # Don't double post findings
+            continue
+        try:
+            print(f)
+            actual_new_findings += 1
+            if pullreq:
+                pullreq.create_review_comment(
+                    f["body"], f["commit_id"], f["path"], f["position"])
+        except:
+            pass
+    return actual_new_findings
+
+
+def get_pullrequest(args):
+    login = github3.login(args.username, args.token)
+    if not login:
+        print("No login possible, falling back to text mode")
+        return None
+    repo = login.repository(args.ghuser, args.repo)
+    return repo.pull_request(args.pullrequest)
+
+
+def main():
+    _args = create_parser()
+    if post_findings(_args, get_pullrequest(_args)):
+        sys.exit(1)
+
+
+if __name__ == '__main__':
+    main()
