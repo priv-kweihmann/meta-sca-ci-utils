@@ -52,12 +52,16 @@ def run_tool(args, pullreq):
         _args += ["--constantfile={}".format(args.constantfile)]
     if args.configfile:
         _args += ["--rulefile={}".format(args.configfile)]
-    for _f in pullreq.files():
-        _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
-        _path, _ext = os.path.splitext(_fullpath)
-        if _ext in [".bb", ".bbappend"]:
-            print("Checking {}".format(_path))
-            _args.append(_fullpath)
+    if not pullreq:
+        _files = glob.glob(args.sources + "/**/*.bb", recursive=True) + glob.glob(args.sources + "/**/*.bbappend", recursive=True)
+        _args += _files
+    else:
+        for _f in pullreq.files():
+            _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
+            _path, _ext = os.path.splitext(_fullpath)
+            if _ext in [".bb", ".bbappend"]:
+                print("Checking {}".format(_path))
+                _args.append(_fullpath)
     try:
         out = subprocess.check_output(
             _args, universal_newlines=True, stderr=subprocess.STDOUT)
