@@ -36,7 +36,7 @@ runs:
     - name: run
       run: |
         EXPORT_BOT_WEBSECRET=${{ inputs.token }} \
-        /github/actions/scripts/oelint \
+        /github/actions/scripts/flake8 \
         --configfile="${{ inputs.config-file }}" \
         "${{ inputs.sources }}" \
         "${{ inputs.username }}" \
