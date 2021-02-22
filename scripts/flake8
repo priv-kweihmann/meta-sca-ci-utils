@@ -40,20 +40,38 @@ def create_parser():
     return _tmp
 
 
+def _filter_by_ending_or_shebang(files):
+    pattern = r"^#!\s*/usr/bin/env\s+python3"
+    res = set()
+    for f in files:
+        _filename, _ext = os.path.splitext(f)
+        if _ext in [".py"]:
+            res.add(f)
+            continue
+        if os.path.isfile(f):
+            with open(f, encoding="utf-8") as i:
+                try:
+                    cnt = i.readlines()
+                    if cnt:
+                        cnt = cnt[0]
+                        if re.match(pattern, cnt):
+                            res.add(f)
+                            print(f)
+                except:
+                    pass
+    return list(res)
+
+
 def run_tool(args, pullreq):
     _args = ["flake8"]
     if args.configfile:
         _args += ["--config={}".format(args.configfile)]
     if not pullreq:
-        _files = glob.glob(args.sources + "/**/*.py", recursive=True)
-        _args += _files
+        _args += _filter_by_ending_or_shebang(
+            glob.glob(args.sources + "/**/*", recursive=True))
     else:
-        for _f in pullreq.files():
-            _fullpath = os.path.join(args.sources, _f.filename.lstrip("/"))
-            _path, _ext = os.path.splitext(_fullpath)
-            if _ext in [".py"]:
-                print("Checking {}".format(_path))
-                _args.append(_fullpath)
+        _args += _filter_by_ending_or_shebang(
+            [os.path.join(args.sources, _f.filename.lstrip("/")) for _f in pullreq.files()])
     try:
         out = subprocess.check_output(
             _args, universal_newlines=True, stderr=subprocess.STDOUT)
