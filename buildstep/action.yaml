@@ -6,11 +6,16 @@ inputs:
   target: 
     description: 'Target to build'
     required: true
+  ignore-exit-codes:
+    description: 'space seperated list of exit codes to ignore as failures'
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
     - name: build
       run: |
+        BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/build \
         --target=${{ inputs.target }}
       shell: bash

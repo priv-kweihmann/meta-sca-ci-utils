@@ -10,11 +10,16 @@ inputs:
     description: 'Repo to use'
     required: false
     default: "meta-sca"
+  ignore-exit-codes:
+    description: 'space seperated list of exit codes to ignore as failures'
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
     - name: test results
       run: |
+        BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/checkresults \
           --modfile=${WORKSPACE}/sources/${{ inputs.repo }}/test/lang_${{ inputs.parameter-file }}.txt \
           --repo=${{ inputs.repo }}

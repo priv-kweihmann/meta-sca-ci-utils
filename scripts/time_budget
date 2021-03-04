@@ -9,6 +9,7 @@ now(){
 
 [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
 
+_acceptable_exit_codes=${BUILD_ACCEPTABLE_EC}
 _timeout=${BUILD_MAXRUNTIME}
 _killto=20
 if [ -e "${WORKSPACE}/.timebudget" ]; then
@@ -26,4 +27,9 @@ _diff=$(expr ${_end} - ${_start})
 echo "## Command took ${_diff} seconds - exit code ${retval}"
 _newtimeout=$(expr ${_timeout} - ${_diff})
 echo ${_newtimeout} > "${WORKSPACE}/.timebudget"
+if [ "${retval}" -ne "0" ]; then
+    for _ex in ${_acceptable_exit_codes}; do
+        [ "${_ex}" -eq "${retval}" ] && exit 0
+    done
+fi
 exit ${retval}

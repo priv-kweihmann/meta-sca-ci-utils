@@ -16,11 +16,16 @@ inputs:
     description: 'Repository name'
     required: false
     default: "priv-kweihmann.github.io"
+  ignore-exit-codes:
+    description: 'space seperated list of exit codes to ignore as failures'
+    required: false
+    default: ""
 runs:
   using: "composite"
   steps:
     - name: export results
       run: |
+        BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         EXPORT_BOT_WEBSECRET=${{ inputs.deploy-token }} /github/actions/scripts/exportfindings \
         --modfilename=${{ inputs.parameter-file }} \
         --branch=${{ inputs.branch }} \
