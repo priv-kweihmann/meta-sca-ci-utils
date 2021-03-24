@@ -17,5 +17,5 @@ runs:
       run: |
         BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/build \
-        --target=${{ inputs.target }}
+        --target="${{ inputs.target }}"
       shell: bash
