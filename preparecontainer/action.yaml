@@ -40,7 +40,7 @@ runs:
       shell: bash
     - name: insert pseudo git credentials
       run: |
-          git config user.name "Lonely CI user"
-          git config user.email "lc@u.ser"
-          git config push.default "current"
+          git config --global user.name "Lonely CI user"
+          git config --global user.email "lc@u.ser"
+          git config --global push.default "current"
       shell: bash
