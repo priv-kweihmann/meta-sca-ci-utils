@@ -44,7 +44,7 @@ clean_download_dir() {
 
 clean_temp_dirs() {
     tmpdir="$(get_var_from_bitbake TMPDIR)"
-    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -name "temp" -exec rm -rf {} \; || true
+    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -name "temp" -exec rm -rf {} \; || true 2>/dev/null
 }
 
 clean_all() {
