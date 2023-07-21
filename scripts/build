@@ -42,3 +42,5 @@ source ${THISDIR}/utils
 setup_bitbake
 ${THISDIR}/time_budget bitbake ${TARGET}
 [ "${CLEAN}" -ne "0" ] && clean_all || true
+# print 50 biggest disk consumers
+du -ah "${WORKSPACE}" | sort -n -r | head -n 50
