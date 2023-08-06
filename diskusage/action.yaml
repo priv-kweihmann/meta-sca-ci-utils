@@ -1,0 +1,12 @@
+# SPDX-License-Identifier: BSD-2-Clause
+# Copyright (c) 2023, Konrad Weihmann
+name: 'Disk usage'
+description: 'Show the biggest 50 assets in the current build dir'
+runs:
+  using: "composite"
+  steps:
+    - name: Print biggest assets
+      run: |
+          [ -z "${WORKSPACE}" ] && WORKSPACE=${GITHUB_WORKSPACE}
+          du -ah "${WORKSPACE}" | sort -rh | head -n 50
+      shell: bash
