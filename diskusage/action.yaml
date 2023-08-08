@@ -8,5 +8,5 @@ runs:
     - name: Print biggest assets
       run: |
           [ -z "${WORKSPACE}" ] && WORKSPACE=${GITHUB_WORKSPACE}
-          du -ah "${WORKSPACE}" | sort -rh | head -n 50
+          du -ah "${WORKSPACE}" | sort -rh | head -n 50 || true
       shell: bash
