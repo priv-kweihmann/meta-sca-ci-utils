@@ -52,7 +52,6 @@ clean_more() {
     # they all consume plenty of space but do not
     # give any extra value to keep
     setup_bitbake
-    rm -rf $(bitbake-getvar -q -r $(bitbake-layers show-recipes | grep gcc-source | tr -d ':') --value WORKDIR)/sources/*/*/testsuite
     rm -rf $(bitbake-getvar -q --value STAGING_KERNEL_DIR)/.git
     rm -rf $(dirname $(bitbake-getvar -q --value BB_DEFAULT_EVENTLOG))
     clean_sock_files
