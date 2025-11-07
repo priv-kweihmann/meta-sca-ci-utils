@@ -15,7 +15,7 @@ setup_bitbake() {
     [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
     if [ "$(has_bitbake)" -ne "0" ]; then
         [ "$PWD" != "${TOPDIR}" ] && cd ${TOPDIR}
-        source ${WORKSPACE}/sources/poky/oe-init-build-env > /dev/null 2>&1
+        source ${WORKSPACE}/sources/openembedded-core/oe-init-build-env 1>&2
     fi
 }
 
@@ -23,48 +23,41 @@ clean_sock_files() {
     setup_bitbake
     rm -f bitbake.sock || true
     rm -f bitbake.lock || true
+    rm -f bitbake-cookerdaemon.log || true
 }
 
 get_var_from_bitbake() {
     setup_bitbake
-    _needle=${1}
-    _retval=""
-    eval $(bitbake busybox -e | grep "^${_needle}" | head -n1)
-    if set | grep -q "^${_needle}="; then
-        eval "_retval="\$${_needle}""
-    fi
+    _retval=$(bitbake-getvar --value --quiet --ignore-undefined "${1}")
     clean_sock_files
     echo "${_retval}"
 }
 
-clean_download_dir() {
-    dldir="$(get_var_from_bitbake DL_DIR)"
-    [ ! -z "${dldir}" ] && rm -rf ${dldir}
+diskusage() {
+    du -ah "${WORKSPACE}" | sort -rh | head -n 50 || true
 }
 
-clean_temp_dirs() {
-    tmpdir="$(get_var_from_bitbake TMPDIR)"
-    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -name "temp" -exec rm -rf {} \; || true 2>/dev/null
-}
+trap "diskusage" 0
 
-clean_more() {
-    # cleanup kernel .git, gcc testsuite and the eventlog
-    # they all consume plenty of space but do not
-    # give any extra value to keep
+clean() {
+    shift
+    skips=$*
     setup_bitbake
-    rm -rf $(bitbake-getvar -q --value STAGING_KERNEL_DIR)/.git
-    rm -rf $(dirname $(bitbake-getvar -q --value BB_DEFAULT_EVENTLOG))
-    clean_sock_files
-}
+    kernel_dir=$(bitbake-getvar -q --value STAGING_KERNEL_DIR)
+    event_log=$(bitbake-getvar -q --value BB_DEFAULT_EVENTLOG)
+    tmp_dir=$(bitbake-getvar -q --value TMPDIR)
+    dl_dir=$(bitbake-getvar -q --value DL_DIR)
+    [ -d "${kernel_dir}/.git" ] && rm -rf "${kernel_dir}/.git"
+    [ -d "${dl_dir}" ] && rm -rf "${dl_dir}"
+    [ -n "${event_log}" ] && [ -d "$(dirname ${event_log})" ] && rm -rf "$(dirname ${event_log})"
 
-clean_all() {
-    clean_download_dir
-    clean_temp_dirs
-    clean_sock_files
-    clean_more
-}
+    for dir in "${tmp_dir}"/*; do
+        dir=$(basename "$dir")
+        if echo "${skips}" | grep -q "$dir"; then
+            continue
+        fi
+        rm -rf "${tmp_dir:?}/${dir}"
+    done
 
-clean_all_but_deploy() {
-    tmpdir="$(get_var_from_bitbake TMPDIR)"
-    [ ! -z "${tmpdir}" ] && find ${tmpdir} -type d -maxdepth 1 -mindepth 1 -not -name "deploy" -exec rm -rf {} \; || true
+    clean_sock_files
 }

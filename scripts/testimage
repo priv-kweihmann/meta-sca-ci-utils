@@ -6,7 +6,7 @@ set -e
 [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
 
 TARGET=""
-CLEAN="1"
+CLEAN_SKIP=""
 TAPGEN="1"
 
 THISDIR="$(dirname $0)"
@@ -15,7 +15,7 @@ usage() {
     echo "$(basename $0) - run a testimage"
     echo "--target - target to build"
     echo "--tapgen - run tapgen"
-    echo "--clean - cleanup afterwards (set 0 to disable)"
+    echo "--clean_skip - cleanup skips"
 }
 
 [ "$#" -eq "0" ] && usage && exit 0
@@ -27,8 +27,8 @@ case $i in
         TARGET="${i#*=}"
         shift
         ;;
-    --clean=*)
-        CLEAN="${i#*=}"
+    --clean_skip=*)
+        CLEAN_SKIP="${CLEAN_SKIP} ${i#*=}"
         shift
         ;;
     --tapgen=*)
@@ -51,4 +51,5 @@ _componentsdir="$(get_var_from_bitbake COMPONENTS_DIR)"
 ## FIXME: don't assume a TMPDIR - get it from bitbake
 [ "${TAPGEN}" -ne "0" ] && sudo ${WORKSPACE}/sources/poky/scripts/runqemu-gen-tapdevs `id -u` `id -g` 1 ${_componentsdir}/x86_64/qemu-helper-native/usr/bin
 ${THISDIR}/time_budget bitbake ${TARGET} -c testimage
-[ "${CLEAN}" -ne "0" ] && clean_all || true
+# shellcheck disable=SC2086
+clean ${CLEAN_SKIP} || true

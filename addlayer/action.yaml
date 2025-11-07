@@ -36,8 +36,8 @@ runs:
       run: |
         /github/actions/scripts/checkout \
         --branch=${{ inputs.branch }} \
-        --addlayer=${{ inputs.add-layer }} \
-        --addlayersuffix=${{ inputs.add-layer-suffix }} \
+        --addlayer="${{ inputs.add-layer }}" \
+        --addlayersuffix="${{ inputs.add-layer-suffix }}" \
         --url=${{ inputs.repo }} \
         --removegit=${{ inputs.remove-git }} \
         --eventfile=${{ inputs.gh-event-file }} \

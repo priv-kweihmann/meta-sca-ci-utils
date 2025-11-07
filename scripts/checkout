@@ -98,5 +98,11 @@ fi
 
 if [ "${ADDLAYER}" -ne "0" ]; then
     setup_bitbake
-    bitbake-layers add-layer ${CODIR}/${_LAYER_NAME}${ADDSUFFIX}
+    if [ -n "${ADDSUFFIX}" ]; then
+        for suffix in ${ADDSUFFIX}; do
+            bitbake-layers add-layer ${CODIR}/${_LAYER_NAME}/$suffix
+        done
+    else
+        bitbake-layers add-layer ${CODIR}/${_LAYER_NAME}
+    fi
 fi
