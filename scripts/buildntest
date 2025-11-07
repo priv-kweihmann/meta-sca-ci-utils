@@ -6,7 +6,7 @@ set -e
 [ -z "${WORKSPACE}" ] && WORKSPACE=$PWD
 
 MODFILE=""
-CLEAN="1"
+CLEAN_SKIP=""
 BUILDNTEST_PRESERVECACHE="1"
 BUILDNTEST_NOTEST="1"
 REPO="meta-sca"
@@ -16,7 +16,7 @@ THISDIR="$(dirname $0)"
 usage() {
     echo "$(basename $0) - build'n'test modules"
     echo "--modfile - modfile to test"
-    echo "--clean - cleanup afterwards (set 0 to disable)"
+    echo "--clean_skip - cleanup skips"
     echo "--preservecache - Preserve existing caches (set 0 to disable)"
     echo "--notest - Don't test results (set 0 to disable)"
     echo "--repo - repo name to use (default: meta-sca)"
@@ -31,8 +31,8 @@ case $i in
         MODFILE="${i#*=}"
         shift
         ;;
-    --clean=*)
-        CLEAN="${i#*=}"
+    --clean_skip=*)
+        CLEAN_SKIP="${CLEAN_SKIP} ${i#*=}"
         shift
         ;;
     --preservecache=*)
@@ -62,4 +62,5 @@ export BUILDNTEST_NOTEST
 
 setup_bitbake
 ${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/test/buildntest ${MODFILE}
-[ "${CLEAN}" -ne "0" ] && clean_all_but_deploy || true
+# shellcheck disable=SC2086
+clean ${CLEAN_SKIP} || true

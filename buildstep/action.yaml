@@ -6,6 +6,10 @@ inputs:
   target: 
     description: 'Target to build'
     required: true
+  clean-skip:
+    description: 'Temporary directories to keep'
+    required: false
+    default: "hosttools sysroots-uninative"
   ignore-exit-codes:
     description: 'space seperated list of exit codes to ignore as failures'
     required: false
@@ -17,5 +21,6 @@ runs:
       run: |
         BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/build \
-        --target="${{ inputs.target }}"
+        --target="${{ inputs.target }}" \
+        --clean_skip="${{ inputs.clean-skip }}"
       shell: bash

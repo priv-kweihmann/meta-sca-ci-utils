@@ -14,6 +14,10 @@ inputs:
     description: 'space seperated list of exit codes to ignore as failures'
     required: false
     default: ""
+  clean-skip:
+    description: 'Temporary directories to keep'
+    required: false
+    default: "hosttools sysroots-uninative"
 runs:
   using: "composite"
   steps:
@@ -22,5 +26,6 @@ runs:
         BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/buildntest \
         --modfile=${WORKSPACE}/sources/${{ inputs.repo }}/test/lang_${{ inputs.parameter-file }}.txt \
-        --repo=${{ inputs.repo }}
+        --repo=${{ inputs.repo }} \
+        --clean_skip="${{ inputs.clean-skip }}"
       shell: bash

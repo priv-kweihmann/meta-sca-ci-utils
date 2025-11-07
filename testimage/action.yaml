@@ -6,10 +6,6 @@ inputs:
   target: 
     description: 'image to check'
     required: true
-  clean: 
-    description: 'cleanup afterwards'
-    required: false
-    default: "1"
   tapgen: 
     description: 'run tapgen'
     required: false
@@ -18,6 +14,10 @@ inputs:
     description: 'space seperated list of exit codes to ignore as failures'
     required: false
     default: ""
+  clean-skip:
+    description: 'Temporary directories to keep'
+    required: false
+    default: "hosttools sysroots-uninative"
 runs:
   using: "composite"
   steps:
@@ -26,6 +26,6 @@ runs:
         BUILD_ACCEPTABLE_EC="${{ inputs.ignore-exit-codes }}" \
         /github/actions/scripts/testimage \
         --target=${{ inputs.target }} \
-        --clean=${{ inputs.clean }} \
+        --clean_skip="${{ inputs.clean-skip }}" \
         --tapgen=${{ inputs.tapgen }}
       shell: bash
