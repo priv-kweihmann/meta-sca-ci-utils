@@ -27,8 +27,13 @@ clean_sock_files() {
 }
 
 get_var_from_bitbake() {
+    if [ "$#" -gt 1 ]; then
+        recipe="-r ${2}"
+    else
+        recipe=""
+    fi
     setup_bitbake
-    _retval=$(bitbake-getvar --value --quiet --ignore-undefined "${1}")
+    _retval=$(bitbake-getvar --value --quiet --ignore-undefined ${recipe} "${1}")
     clean_sock_files
     echo "${_retval}"
 }

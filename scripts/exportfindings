@@ -46,8 +46,8 @@ done
 
 source ${THISDIR}/utils
 
-_sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR)"
-_sca_export_find_dir="$(get_var_from_bitbake SCA_EXPORT_FINDING_DIR)"
+_sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR busybox)"
+_sca_export_find_dir="$(get_var_from_bitbake SCA_EXPORT_FINDING_DIR busybox)"
 
 setup_bitbake
 
