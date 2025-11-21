@@ -52,4 +52,4 @@ _componentsdir="$(get_var_from_bitbake COMPONENTS_DIR)"
 [ "${TAPGEN}" -ne "0" ] && sudo ${WORKSPACE}/sources/poky/scripts/runqemu-gen-tapdevs `id -u` `id -g` 1 ${_componentsdir}/x86_64/qemu-helper-native/usr/bin
 ${THISDIR}/time_budget bitbake ${TARGET} -c testimage
 # shellcheck disable=SC2086
-clean ${CLEAN_SKIP} || true
+clean "${CLEAN_SKIP}" || true

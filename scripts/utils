@@ -45,7 +45,6 @@ diskusage() {
 trap "diskusage" 0
 
 clean() {
-    shift
     skips=$*
     setup_bitbake
     kernel_dir=$(bitbake-getvar -q --value STAGING_KERNEL_DIR)

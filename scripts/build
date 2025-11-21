@@ -42,4 +42,4 @@ source ${THISDIR}/utils
 setup_bitbake
 ${THISDIR}/time_budget bitbake ${TARGET}
 # shellcheck disable=SC2086
-clean ${CLEAN_SKIP} || true
+clean "${CLEAN_SKIP}" || true

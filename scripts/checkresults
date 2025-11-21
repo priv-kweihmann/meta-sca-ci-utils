@@ -56,4 +56,4 @@ sca_export_dir="$(get_var_from_bitbake SCA_EXPORT_DIR busybox)"
 [ -z "${sca_export_dir}" ] && echo "Can't determine the SCA_EXPORT_DIR" && exit 1
 ${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/test/check_results "${sca_export_dir}" ${MODFILE}
 # shellcheck disable=SC2086
-clean ${CLEAN_SKIP} || true
+clean "${CLEAN_SKIP}" || true

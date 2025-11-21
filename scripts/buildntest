@@ -63,4 +63,4 @@ export BUILDNTEST_NOTEST
 setup_bitbake
 ${THISDIR}/time_budget ${WORKSPACE}/sources/${REPO}/test/buildntest ${MODFILE}
 # shellcheck disable=SC2086
-clean ${CLEAN_SKIP} || true
+clean "${CLEAN_SKIP}" || true
