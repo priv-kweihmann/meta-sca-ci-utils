@@ -56,6 +56,8 @@ clean() {
     [ -d "${dl_dir}" ] && rm -rf "${dl_dir}"
     [ -n "${event_log}" ] && [ -d "$(dirname ${event_log})" ] && rm -rf "$(dirname ${event_log})"
 
+    ls -l "${tmp_dir}"
+
     for dir in "${tmp_dir}"/*; do
         dir=$(basename "$dir")
         if echo "${skips}" | grep -q "$dir"; then
@@ -63,6 +65,8 @@ clean() {
         fi
         rm -rf "${tmp_dir:?}/${dir}"
     done
+
+    ls -l "${tmp_dir}"
 
     clean_sock_files
 }
