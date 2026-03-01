@@ -49,7 +49,7 @@ def run_tool(args, pullreq):
     if args.rulesdir:
         _args += ["--customrules={}".format(args.rulesdir)]
     if args.constantfile:
-        _args += ["--constantfile={}".format(args.constantfile)]
+        _args += ["--constantmod=+{}".format(args.constantfile)]
     if args.configfile:
         _args += ["--rulefile={}".format(args.configfile)]
     if not pullreq:
